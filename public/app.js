@@ -148,7 +148,8 @@
       const st = steps[S.step];
       topTitle.textContent = "「家用液化石油氣供氣定型化契約」問卷";
       topStep.textContent = `${S.step + 1} / ${steps.length}`;
-      progress.innerHTML = steps.map((_, i) => `<i class="${i <= S.step ? "on" : ""}"></i>`).join("");
+      progress.innerHTML = `<button type="button" class="home-btn" data-act="restart" aria-label="回到首頁"${S.sending ? " disabled" : ""}><svg viewBox="0 0 10 16" width="9" height="15" aria-hidden="true"><path d="M8.5 1.5 2 8l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>首頁</button>`
+        + `<div class="bars">${steps.map((_, i) => `<i class="${i <= S.step ? "on" : ""}"></i>`).join("")}</div>`;
       let h = `<h1 class="title">${esc(st.title)}</h1>`;
       if (st.hint) h += `<p class="sub">${esc(st.hint)}</p>`;
       if (st.video) {
@@ -158,7 +159,6 @@
           <p class="sub" style="margin-top:12px">看完影片後，按下方「開始作答」。</p>`;
       }
       h += st.questions.map((k) => questionHTML(k)).join("");
-      h += `<div class="restart"><button type="button" class="link" data-act="restart"${S.sending ? " disabled" : ""}>回到首頁</button></div>`;
       body.innerHTML = h;
       const last = S.step === steps.length - 1;
       foot.className = "inner foot-in";
