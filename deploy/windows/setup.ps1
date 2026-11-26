@@ -12,7 +12,7 @@
   隔離方式：
     - 套件裝在專案內的 .venv，不動到系統 Python。
     - 程式以 IIS 專屬的低權限帳戶「IIS AppPool\lpg-survey」執行：
-      只能讀取專案資料夾、寫入 output\，secrets 只有它與系統管理員讀得到。
+      只能讀取專案資料夾、寫入 output\，config\credentials.toml 只有它與系統管理員讀得到。
     - uvicorn 只聽 127.0.0.1，外部只能經過 IIS 連進來。
 #>
 param(
@@ -42,7 +42,9 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "2/5 產生 iis\web.config" -ForegroundColor Cyan
-if (Test-Path "IIS:\AppPools\$AppName") { Stop-WebAppPool -Name $AppName -ErrorAction SilentlyContinue }
+if ((Test-Path "IIS:\AppPools\$AppName") -and (Get-WebAppPoolState -Name $AppName).Value -ne "Stopped") {
+  try { Stop-WebAppPool -Name $AppName } catch { }
+}
 $appDir = Join-Path $root "iis"
 New-Item -ItemType Directory -Force $appDir | Out-Null
 $config = Get-Content "$PSScriptRoot\web.config.template" -Raw -Encoding UTF8
@@ -69,10 +71,10 @@ Write-Host "4/5 設定資料夾權限" -ForegroundColor Cyan
 $account = "IIS AppPool\$AppName"
 icacls $root /grant "${account}:(OI)(CI)RX" | Out-Null
 icacls "$root\output" /grant "${account}:(OI)(CI)M" | Out-Null
-if (Test-Path "$root\.streamlit\secrets.toml") {
-  icacls "$root\.streamlit" /inheritance:r /grant:r "Administrators:(OI)(CI)F" "SYSTEM:(OI)(CI)F" "${account}:(OI)(CI)R" | Out-Null
+if (Test-Path "$root\config\credentials.toml") {
+  icacls "$root\config" /inheritance:r /grant:r "Administrators:(OI)(CI)F" "SYSTEM:(OI)(CI)F" "${account}:(OI)(CI)R" | Out-Null
 } else {
-  Write-Warning "找不到 .streamlit\secrets.toml，資料會只寫到 output\*.csv。放好後請重跑此腳本。"
+  Write-Warning "找不到 config\credentials.toml，資料會只寫到 output\*.csv。放好後請重跑此腳本。"
 }
 
 Write-Host "5/5 在網站「$Site」下建立 /$AppName" -ForegroundColor Cyan

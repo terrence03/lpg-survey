@@ -6,7 +6,7 @@ services:
       - "8538:8080"
     environment:
       - TZ=Asia/Taipei
-      - SECRETS_FILE=/app/.streamlit/secrets.toml
+      - SECRETS_FILE=/app/config/credentials.toml
     volumes:
-      - ./.streamlit:/app/.streamlit:ro
+      - ./config:/app/config:ro
       - ./output:/app/output
