@@ -1,6 +1,7 @@
 "use strict";
 (() => {
-  const API = (window.LPG_API_BASE || "").replace(/\/$/, "");
+  // Relative by default so the site also works under a sub-path such as /lpg-survey/.
+  const API = (window.LPG_API_BASE || ".").replace(/\/$/, "");
   const STORE = "lpg-survey-v1";
   const OUTBOX = "lpg-outbox-v1";
   const $ = (id) => document.getElementById(id);
