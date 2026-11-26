@@ -42,7 +42,9 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "2/5 產生 iis\web.config" -ForegroundColor Cyan
-if (Test-Path "IIS:\AppPools\$AppName") { Stop-WebAppPool -Name $AppName -ErrorAction SilentlyContinue }
+if ((Test-Path "IIS:\AppPools\$AppName") -and (Get-WebAppPoolState -Name $AppName).Value -ne "Stopped") {
+  try { Stop-WebAppPool -Name $AppName } catch { }
+}
 $appDir = Join-Path $root "iis"
 New-Item -ItemType Directory -Force $appDir | Out-Null
 $config = Get-Content "$PSScriptRoot\web.config.template" -Raw -Encoding UTF8
