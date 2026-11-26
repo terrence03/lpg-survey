@@ -5,7 +5,7 @@
   const STORE = "lpg-survey-v1";
   const OUTBOX = "lpg-outbox-v1";
   const $ = (id) => document.getElementById(id);
-  const body = $("body"), foot = $("foot"), progress = $("progress");
+  const body = $("body"), scroller = $("scroller"), foot = $("foot"), progress = $("progress");
   const topTitle = $("topTitle"), topStep = $("topStep"), toast = $("toast");
 
   let CFG = null; // questions.json
@@ -105,7 +105,8 @@
 
   function optionsHTML(k) {
     const d = Q(k), multi = d.type === "multi", v = S.a[k], quiz = d.answer;
-    let h = `<div class="opts${d.layout === "chips" ? " chips" : ""}" role="${multi ? "group" : "radiogroup"}" aria-labelledby="qt_${k}">`;
+    const kind = d.layout === "chips" ? " chips" : quiz ? " quiz" : multi && Object.keys(d.options).length > 4 ? " multi-list" : "";
+    let h = `<div class="opts${kind}" role="${multi ? "group" : "radiogroup"}" aria-labelledby="qt_${k}">`;
     for (const [n, label] of Object.entries(d.options)) {
       const sel = multi ? has(k, n) : v === n;
       let cls = "opt" + (multi ? " multi" : "") + (sel ? " sel" : "");
@@ -133,13 +134,14 @@
     topStep.textContent = "";
     if (v === "home") {
       topTitle.textContent = "宣導活動";
-      body.innerHTML = `<div class="hero"><img src="img/mascot.webp" width="170" height="166" alt="LPG 宣導吉祥物"><h1 class="title">家用液化石油氣<br>供氣定型化契約宣導活動</h1></div>
+      body.innerHTML = `<div class="home"><div class="hero"><img src="img/mascot.webp" width="170" height="166" alt="LPG 宣導吉祥物"></div>
+        <div class="home-text"><h1 class="title">家用液化石油氣<br>供氣定型化契約宣導活動</h1>
         <div class="gifts">
           <div class="gift"><b>1</b>完成打卡即可獲得小禮物乙份</div>
           <div class="gift"><b>2</b>完成活動問卷即可獲得精美實用禮乙份</div>
           <div class="gift"><b>!</b>宣導品數量有限，送完為止！</div>
-        </div>`;
-      foot.className = "foot col";
+        </div></div></div>`;
+      foot.className = "inner foot-in col";
       foot.innerHTML = `<button class="btn pri" data-act="start">填寫問卷獲得精美實用禮</button><button class="btn sec" data-act="checkin">僅打卡</button>`;
     } else if (v === "survey") {
       const st = steps[S.step];
@@ -157,7 +159,7 @@
       h += st.questions.map((k) => questionHTML(k)).join("");
       body.innerHTML = h;
       const last = S.step === steps.length - 1;
-      foot.className = "foot";
+      foot.className = "inner foot-in";
       foot.innerHTML = (S.step > 0 ? `<button class="btn sec" data-act="prev">上一步</button>` : "")
         + `<button class="btn pri" data-act="next"${S.sending ? " disabled" : ""}>${S.sending ? "送出中…" : S.step === 0 ? "開始作答" : last ? "送出" : "下一步"}</button>`;
     } else {
@@ -165,8 +167,8 @@
       topTitle.textContent = survey ? "問卷完成" : "打卡完成";
       body.innerHTML = `<div class="done"><p class="slogan">購買瓦斯簽契約，消費權益有保障</p>
         <img src="img/${survey ? "survey_complete" : "checkin_complete"}.webp" alt="${survey ? "問卷完成，請出示此畫面給工作人員領取精美禮物" : "打卡完成，請出示此畫面給工作人員領取小禮物"}"></div>`;
-      foot.className = "foot";
-      foot.innerHTML = `<button class="btn sec" data-act="home" style="flex:1">返回首頁</button>`;
+      foot.className = "inner foot-in";
+      foot.innerHTML = `<button class="btn sec wide" data-act="home">返回首頁</button>`;
     }
   }
   const videoId = (url) => (url.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/) || [])[1] || "";
@@ -178,7 +180,7 @@
 
   // ---------- navigation (phone back button moves between steps) ----------
   function go(view, step = 0, push = true) {
-    S.view = view; S.step = step; err = null; persist(); render(); body.scrollTop = 0;
+    S.view = view; S.step = step; err = null; persist(); render(); scroller.scrollTop = 0;
     if (push) history.pushState({ view, step }, "", view === "survey" ? `#step-${step + 1}` : view === "home" ? location.pathname : `#${view}`);
   }
   window.addEventListener("popstate", (e) => {
@@ -200,7 +202,7 @@
     } else S.a[k] = t.value;
     if (err && !RULES[S.step]()) err = null;
     persist();
-    const y = body.scrollTop; render(); body.scrollTop = y;
+    const y = scroller.scrollTop; render(); scroller.scrollTop = y;
     const el = document.getElementById(`${k}_${t.value}`); if (el) el.focus({ preventScroll: true });
   });
   body.addEventListener("input", (e) => { const k = e.target.dataset.text; if (k) { S.t[k] = e.target.value; persist(); } });

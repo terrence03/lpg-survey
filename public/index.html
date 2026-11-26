@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#4f6b88">
+<meta name="theme-color" content="#429f8a">
+<meta name="color-scheme" content="light">
 <script>
   // Relative asset paths need a trailing slash, e.g. /lpg-survey -> /lpg-survey/
   if (!/\/$|\.html$/.test(location.pathname)) location.replace(location.pathname + "/" + location.search + location.hash);
@@ -16,14 +17,16 @@
 <body>
 <div class="app" id="app">
   <header class="top">
-    <div class="top-row">
-      <span id="topTitle">宣導活動</span>
-      <span id="topStep" class="top-step"></span>
+    <div class="inner">
+      <div class="top-row">
+        <span id="topTitle">宣導活動</span>
+        <span id="topStep" class="top-step"></span>
+      </div>
+      <div class="progress" id="progress" hidden></div>
     </div>
-    <div class="progress" id="progress" hidden></div>
   </header>
-  <main class="body" id="body" tabindex="-1"></main>
-  <footer class="foot" id="foot"></footer>
+  <main class="body" id="scroller" tabindex="-1"><div class="inner" id="body"></div></main>
+  <footer class="foot"><div class="inner foot-in" id="foot"></div></footer>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </div>
 <noscript><p style="padding:16px">此問卷需要開啟 JavaScript 才能填寫。</p></noscript>
