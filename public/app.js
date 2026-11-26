@@ -136,11 +136,14 @@
       topTitle.textContent = "宣導活動";
       body.innerHTML = `<div class="home"><div class="hero"><img src="img/mascot.webp" width="170" height="166" alt="LPG 宣導吉祥物"></div>
         <div class="home-text"><h1 class="title">家用液化石油氣<br>供氣定型化契約宣導活動</h1>
-        <div class="gifts">
-          <div class="gift"><b>1</b>完成打卡即可獲得小禮物乙份</div>
-          <div class="gift"><b>2</b>完成活動問卷即可獲得精美實用禮乙份</div>
-          <div class="gift"><b>!</b>宣導品數量有限，送完為止！</div>
-        </div></div></div>`;
+        <section class="gifts" aria-labelledby="giftsH">
+          <h2 class="gifts-h" id="giftsH">活動好禮</h2>
+          <ul>
+            <li>完成打卡，即可獲得<b>小禮物</b>乙份</li>
+            <li>完成活動問卷，即可獲得<b>精美實用禮</b>乙份</li>
+          </ul>
+          <p class="gifts-note">※ 宣導品數量有限，送完為止！</p>
+        </section></div></div>`;
       foot.className = "inner foot-in col";
       foot.innerHTML = `<button class="btn pri" data-act="start">填寫問卷獲得精美實用禮</button><button class="btn sec" data-act="checkin">僅打卡</button>`;
     } else if (v === "survey") {
