@@ -11,6 +11,7 @@
   let CFG = null; // questions.json
   let S = null;   // { sid, view: home|survey|checkin-done|survey-done, step, a:{}, t:{}, sending }
   let err = null; // { card, msg }
+  let gen = Date.now(); // bumped on restart; history entries from before it are ignored
 
   // ---------- storage (best effort) ----------
   const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
@@ -157,6 +158,7 @@
           <p class="sub" style="margin-top:12px">看完影片後，按下方「開始作答」。</p>`;
       }
       h += st.questions.map((k) => questionHTML(k)).join("");
+      if (S.step > 0) h += `<div class="restart"><button type="button" class="link" data-act="restart"${S.sending ? " disabled" : ""}>重新作答</button></div>`;
       body.innerHTML = h;
       const last = S.step === steps.length - 1;
       foot.className = "inner foot-in";
@@ -178,16 +180,36 @@
     clearTimeout(showToast.t); showToast.t = setTimeout(() => (toast.hidden = true), 3500);
   }
 
+  // Small in-page confirm (native confirm() is unreliable in some in-app browsers).
+  function ask(msg, okText) {
+    return new Promise((done) => {
+      const box = document.createElement("div");
+      box.className = "modal";
+      box.innerHTML = `<div class="modal-card" role="alertdialog" aria-modal="true" aria-labelledby="modalMsg">
+        <p id="modalMsg">${esc(msg)}</p>
+        <div class="modal-btns"><button type="button" class="btn sec" data-r="0">取消</button><button type="button" class="btn pri" data-r="1">${esc(okText)}</button></div></div>`;
+      const close = (r) => { box.remove(); document.removeEventListener("keydown", onKey); done(r); };
+      const onKey = (e) => { if (e.key === "Escape") close(false); };
+      box.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-r]");
+        if (b) close(b.dataset.r === "1"); else if (e.target === box) close(false);
+      });
+      document.addEventListener("keydown", onKey);
+      $("app").appendChild(box);
+      box.querySelector('[data-r="0"]').focus();
+    });
+  }
+
   // ---------- navigation (phone back button moves between steps) ----------
   function go(view, step = 0, push = true) {
     S.view = view; S.step = step; err = null; persist(); render(); scroller.scrollTop = 0;
-    if (push) history.pushState({ view, step }, "", view === "survey" ? `#step-${step + 1}` : view === "home" ? location.pathname : `#${view}`);
+    if (push) history.pushState({ view, step, gen }, "", view === "survey" ? `#step-${step + 1}` : view === "home" ? location.pathname : `#${view}`);
   }
   window.addEventListener("popstate", (e) => {
     const st = e.state;
     if (S.view !== "survey") return; // done pages: back does nothing special
-    if (st && st.view === "survey") go("survey", st.step, false);
-    else history.pushState({ view: "survey", step: S.step }, "", `#step-${S.step + 1}`);
+    if (st && st.view === "survey" && st.gen === gen) go("survey", st.step, false);
+    else history.pushState({ view: "survey", step: S.step, gen }, "", `#step-${S.step + 1}`);
   });
 
   // ---------- events ----------
@@ -220,6 +242,14 @@
       go("checkin-done");
     } else if (act === "home") {
       S = fresh(); persist(); go("home");
+    } else if (act === "restart") {
+      if (S.sending || !(await ask("將清除已填寫內容，確定要重新作答嗎？", "重新作答"))) return;
+      // Same sid: the check-in row for this person is already written, so
+      // starting over must not count them twice.
+      S = { sid: S.sid, view: "survey", step: 0, a: {}, t: {} };
+      gen = Date.now();
+      go("survey", 0, false);
+      history.replaceState({ view: "survey", step: 0, gen }, "", "#step-1");
     } else if (act === "prev") {
       history.back();
     } else if (act === "play") {
@@ -259,9 +289,9 @@
     S.sending = false;
     if (S.view === "survey") {
       S.step = Math.min(S.step, CFG.steps.length - 1);
-      history.replaceState({ view: "survey", step: 0 }, "", "#step-1");
-      for (let i = 1; i <= S.step; i++) history.pushState({ view: "survey", step: i }, "", `#step-${i + 1}`);
-    } else history.replaceState({ view: S.view, step: 0 }, "", S.view === "home" ? location.pathname : `#${S.view}`);
+      history.replaceState({ view: "survey", step: 0, gen }, "", "#step-1");
+      for (let i = 1; i <= S.step; i++) history.pushState({ view: "survey", step: i, gen }, "", `#step-${i + 1}`);
+    } else history.replaceState({ view: S.view, step: 0, gen }, "", S.view === "home" ? location.pathname : `#${S.view}`);
     render();
     fetch(API + "/api/health").catch(() => {}); // wake the server early
     flush();
