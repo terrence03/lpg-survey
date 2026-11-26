@@ -3,3 +3,4 @@ starlette==0.46.2
 uvicorn==0.34.2
 google-auth==2.38.0
 urllib3==2.4.0
+packaging==25.0
