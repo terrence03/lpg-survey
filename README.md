@@ -37,11 +37,11 @@ uvicorn server.main:app --reload --port 8080
 
 沒有設定試算表時，資料會寫到 `output/checkin.csv` 和 `output/survey.csv`。
 
-也可以用 Docker：把原本的 `.streamlit/secrets.toml` 放到專案根目錄的 `.streamlit/` 下，然後執行 `docker compose up --build`，網址是 http://localhost:8538 。
+也可以用 Docker：把金鑰設定檔放到 `config/credentials.toml`，然後執行 `docker compose up --build`，網址是 http://localhost:8538 。
 
 ### 設定方式（擇一）
 
-1. **沿用原版 secrets.toml**：格式與原版相同，含 `[gcp_service_account]` 與 `[spreadsheet] check_in / response`。用 `SECRETS_FILE` 指定路徑，預設為 `.streamlit/secrets.toml`。
+1. **設定檔 `config/credentials.toml`**：內容格式與原 Streamlit 版的 `secrets.toml` 完全相同，含 `[gcp_service_account]` 與 `[spreadsheet] check_in / response`，可以直接把舊檔改名放進來。也可以用 `SECRETS_FILE` 指定其他路徑。舊位置 `.streamlit/secrets.toml` 仍然讀得到，但建議搬到新位置。這個資料夾已被 `.gitignore` 排除，不會進 Git。
 2. **環境變數**：`SPREADSHEET_CHECKIN`、`SPREADSHEET_RESPONSE`，以及選填的 `GCP_SERVICE_ACCOUNT_JSON`（整份金鑰 JSON 字串）。沒給金鑰時，會使用執行環境的預設身分，例如 Cloud Run 綁定的服務帳戶。
 
 ## 部署到 Windows Server（IIS 子路徑，例如 https://lpg.org.tw/lpg-survey/）
@@ -60,7 +60,7 @@ IIS 負責網域和 HTTPS。微軟官方外掛 **HttpPlatformHandler** 會自動
 ### 2. 放程式並執行安裝腳本
 
 1. 把這個 repo 放到伺服器上，例如 `D:\apps\lpg-survey`，可以用 `git clone` 或下載 ZIP 解壓縮。
-2. 把原本的 `.streamlit\secrets.toml` 複製到 `D:\apps\lpg-survey\.streamlit\secrets.toml`，格式不用改。
+2. 把原本的 `.streamlit\secrets.toml` 複製到 `D:\apps\lpg-survey\config\credentials.toml`（改名即可，內容不用動）。
 3. 以系統管理員身分開 PowerShell，執行：
 
 ```powershell
@@ -81,7 +81,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 腳本預設用以下方式和系統隔開：
 - 套件裝在專案內的 `.venv`。
 - 程式以 IIS 專屬低權限帳戶 `IIS AppPool\lpg-survey` 執行，只能讀取專案資料夾、寫入 `output\`。
-- `secrets.toml` 只有系統管理員和該帳戶讀得到。
+- `config\credentials.toml` 只有系統管理員和該帳戶讀得到。
 - 程式只監聽 `127.0.0.1`。
 
 ### 記錄檔與資料

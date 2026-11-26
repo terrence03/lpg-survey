@@ -17,7 +17,7 @@
                   stdoutLogFile="{{ROOT}}\output\logs\stdout">
       <environmentVariables>
         <environmentVariable name="BASE_PATH" value="{{BASE_PATH}}" />
-        <environmentVariable name="SECRETS_FILE" value="{{ROOT}}\.streamlit\secrets.toml" />
+        <environmentVariable name="SECRETS_FILE" value="{{ROOT}}\config\credentials.toml" />
         <environmentVariable name="OUTPUT_DIR" value="{{ROOT}}\output" />
         <environmentVariable name="TZ" value="Asia/Taipei" />
       </environmentVariables>

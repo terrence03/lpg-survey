@@ -26,8 +26,11 @@ def get_timestamp() -> str:
 
 
 def _load_secrets() -> dict:
-    """Read the old .streamlit/secrets.toml format if present, else env vars."""
-    path = Path(os.environ.get("SECRETS_FILE", ".streamlit/secrets.toml"))
+    """Read config/credentials.toml (same format as the old Streamlit
+    secrets.toml) if present, else env vars."""
+    path = Path(os.environ.get("SECRETS_FILE", "config/credentials.toml"))
+    if not path.is_file() and "SECRETS_FILE" not in os.environ:
+        path = Path(".streamlit/secrets.toml")  # old location, still accepted
     if path.is_file():
         with path.open("rb") as f:
             return tomllib.load(f)

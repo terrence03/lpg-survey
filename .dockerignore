@@ -1,5 +1,6 @@
 .git
 .streamlit
+config
 output
 scripts
 **/__pycache__
