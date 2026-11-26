@@ -225,7 +225,7 @@
     } else if (act === "play") {
       const id = videoId(CFG.video);
       btn.classList.add("playing");
-      btn.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0" title="宣導影片" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+      btn.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&rel=0" title="宣導影片" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
       btn.removeAttribute("data-act");
     } else if (act === "next") {
       const m = RULES[S.step]();
