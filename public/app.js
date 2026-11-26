@@ -154,7 +154,7 @@
         const id = videoId(CFG.video);
         h += `<p class="sub">感謝您參與本次宣導活動，請<b>先觀看影片再填寫本問卷</b>，完成後即可獲取精美小禮物。</p>
           <button type="button" class="video" id="video" data-act="play" style="background-image:url('https://i.ytimg.com/vi/${id}/hqdefault.jpg')" aria-label="播放宣導影片"><span class="play"></span></button>
-          <p class="sub" style="margin-top:12px">看完影片後，按下方「開始作答」。作答內容會自動暫存在這支手機上。</p>`;
+          <p class="sub" style="margin-top:12px">看完影片後，按下方「開始作答」。</p>`;
       }
       h += st.questions.map((k) => questionHTML(k)).join("");
       body.innerHTML = h;
@@ -240,7 +240,7 @@
       const ok = await send("/api/survey", payload());
       S.sending = false;
       go("survey-done");
-      if (!ok) showToast("網路不穩，答案已暫存在手機，稍後會自動補送");
+      if (!ok) showToast("網路不穩，稍後自動重新上傳結果");
     }
   });
 
