@@ -71,7 +71,15 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\deploy\windows\install-service.ps1 -Nssm C:\tools\nssm\nssm.exe
 ```
 
-最後一行顯示 `ok : True` 就代表服務已經在跑。服務會開機自動啟動，log 寫在 `output\service.log`。如果寫入 Sheets 失敗，備援的 CSV 也在 `output\`。
+最後一行顯示 `ok : True` 就代表服務已經在跑。
+
+腳本預設用以下方式和系統隔開：
+- 套件裝在專案內的 `.venv`。
+- 服務以專屬低權限帳戶 `NT SERVICE\lpg-survey` 執行，只能讀取程式資料夾、寫入 `output\`。
+- `secrets.toml` 只有系統管理員和該帳戶讀得到。
+- 服務只監聽 `127.0.0.1`。
+
+安裝 Python 時請選「Install for all users」，否則這個服務帳戶讀不到 Python。服務會開機自動啟動，log 寫在 `output\service.log`。如果寫入 Sheets 失敗，備援的 CSV 也在 `output\`。
 
 ### 3. 在 IIS 掛上 /lpg-survey
 
