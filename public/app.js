@@ -148,7 +148,7 @@
       const st = steps[S.step];
       topTitle.textContent = "「家用液化石油氣供氣定型化契約」問卷";
       topStep.textContent = `${S.step + 1} / ${steps.length}`;
-      progress.innerHTML = `<button type="button" class="home-btn" data-act="restart" aria-label="回到首頁"${S.sending ? " disabled" : ""}><svg viewBox="0 0 10 16" width="9" height="15" aria-hidden="true"><path d="M8.5 1.5 2 8l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>首頁</button>`
+      progress.innerHTML = `<button type="button" class="home-btn" data-act="restart"${S.sending ? " disabled" : ""}><svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M3 9.5 10 3.5l7 6M5 8v8.5h10V8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>回到首頁</button>`
         + `<div class="bars">${steps.map((_, i) => `<i class="${i <= S.step ? "on" : ""}"></i>`).join("")}</div>`;
       let h = `<h1 class="title">${esc(st.title)}</h1>`;
       if (st.hint) h += `<p class="sub">${esc(st.hint)}</p>`;
