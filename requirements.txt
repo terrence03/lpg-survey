@@ -1,3 +1,5 @@
-fastapi==0.115.12
+# 全部都是純 Python 套件（沒有編譯過的 DLL），避免 Windows 應用程式控制原則擋下載入。
+starlette==0.46.2
 uvicorn==0.34.2
-google-auth[requests]==2.38.0
+google-auth==2.38.0
+urllib3==2.4.0

@@ -10,14 +10,15 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import google.auth
-from google.auth.transport.requests import AuthorizedSession
+import urllib3
+from google.auth.transport.urllib3 import AuthorizedHttp
 from google.oauth2 import service_account
 
 log = logging.getLogger("storage")
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", "output"))
 _lock = threading.Lock()
-_session: AuthorizedSession | None = None
+_http: AuthorizedHttp | None = None
 
 
 def get_timestamp() -> str:
@@ -42,30 +43,33 @@ def _load_secrets() -> dict:
 SECRETS = _load_secrets()
 
 
-def _get_session() -> AuthorizedSession:
-    global _session
-    if _session is None:
+def _get_http() -> AuthorizedHttp:
+    global _http
+    if _http is None:
         info = SECRETS.get("gcp_service_account")
         if info:
             creds = service_account.Credentials.from_service_account_info(dict(info), scopes=SCOPES)
         else:  # e.g. Cloud Run with an attached service account
             creds, _ = google.auth.default(scopes=SCOPES)
-        _session = AuthorizedSession(creds)
-    return _session
+        _http = AuthorizedHttp(creds, http=urllib3.PoolManager(timeout=urllib3.Timeout(total=15)))
+    return _http
 
 
 def _append_sheet(spreadsheet_id: str, rows: list) -> None:
     if not spreadsheet_id:
         raise RuntimeError("spreadsheet id not configured")
-    url = f"https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values/A1:append"
-    r = _get_session().post(
-        url,
-        params={"valueInputOption": "USER_ENTERED", "insertDataOption": "INSERT_ROWS"},
-        json={"values": rows},
-        timeout=15,
+    url = (
+        f"https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values/A1:append"
+        "?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS"
     )
-    r.raise_for_status()
-    log.info("%s cells appended", r.json().get("updates", {}).get("updatedCells"))
+    r = _get_http().request(
+        "POST", url,
+        body=json.dumps({"values": rows}).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+    )
+    if r.status >= 300:
+        raise RuntimeError(f"Sheets API {r.status}: {r.data[:300]!r}")
+    log.info("%s cells appended", json.loads(r.data).get("updates", {}).get("updatedCells"))
 
 
 def _write_csv(name: str, headers: list, rows: list) -> None:
