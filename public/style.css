@@ -125,7 +125,6 @@ h1.title { font-size: 22px; line-height: 1.35; font-weight: 900; margin: 0 0 4px
   .foot-in .btn { flex: 0 0 auto; min-width: 180px; }
   .foot-in.col { flex-direction: row-reverse; justify-content: flex-start; }
   .foot-in .btn.sec.wide { flex: 0 0 auto; }
-  .video { max-width: 640px; }
   .done img { max-width: 520px; }
   .toast { left: 50%; right: auto; transform: translateX(-50%); width: min(480px, calc(100% - 32px)); }
 }
