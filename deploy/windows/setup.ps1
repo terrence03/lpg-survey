@@ -36,6 +36,10 @@ if (-not (Test-Path ".venv")) { py -3.13 -m venv .venv }
 & .\.venv\Scripts\python.exe -m pip install --upgrade pip --quiet
 & .\.venv\Scripts\python.exe -m pip install -r requirements.txt --quiet
 New-Item -ItemType Directory -Force "output\logs" | Out-Null
+& .\.venv\Scripts\python.exe -c "import server.main"
+if ($LASTEXITCODE -ne 0) {
+  throw "程式無法載入（見上方錯誤）。若是 DLL 或存取被拒，請確認防毒或應用程式控管沒有擋住 $root。"
+}
 
 Write-Host "2/5 產生 iis\web.config" -ForegroundColor Cyan
 $appDir = Join-Path $root "iis"

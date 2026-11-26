@@ -3,11 +3,11 @@
 原 Streamlit 版問卷網站的輕量化重寫。流程、題目、跳題規則、必填規則與寫入 Google Sheets 的欄位格式都和原版相同。
 
 - **前端**：`public/` 內的純 HTML／CSS／JS，沒有建置步驟。題目與跳題規則全部在 `public/questions.json`。
-- **後端**：`server/` 內的 FastAPI，負責提供靜態檔，以及兩支 API：
+- **後端**：`server/` 內的 Starlette（FastAPI 的底層框架），負責提供靜態檔，以及兩支 API：
   - `POST /api/checkin`：寫一筆打卡紀錄 `[timestamp, sid]`
   - `POST /api/survey`：檢查必填後寫一筆問卷紀錄（欄位順序同原版 `SURVEY_HEADERS`）
   - 寫入 Sheets 失敗時，退回寫本機 `output/*.csv`，並把該列內容記錄到 log
-- 直接相依套件只有 3 個（fastapi、uvicorn、google-auth）。
+- 直接相依套件只有 4 個（starlette、uvicorn、google-auth、urllib3），而且全部是純 Python，沒有編譯過的 DLL。這樣伺服器上的防毒軟體或應用程式控管不會擋下載入。
 
 ## 和原版的差異
 
