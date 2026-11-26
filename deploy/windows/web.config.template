@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  由 setup.ps1 產生到 iis\web.config，請勿直接修改產生出來的檔案。
+  IIS 的 HttpPlatformHandler 會自動啟動 uvicorn、轉交請求，並在程式結束時自動重啟。
+-->
+<configuration>
+  <system.webServer>
+    <handlers>
+      <add name="httpPlatformHandler" path="*" verb="*" modules="httpPlatformHandler" resourceType="Unspecified" />
+    </handlers>
+    <httpPlatform processPath="{{ROOT}}\.venv\Scripts\python.exe"
+                  arguments="-m uvicorn server.main:app --app-dir &quot;{{ROOT}}&quot; --host 127.0.0.1 --port %HTTP_PLATFORM_PORT%"
+                  startupTimeLimit="60"
+                  startupRetryCount="3"
+                  processesPerApplication="1"
+                  stdoutLogEnabled="true"
+                  stdoutLogFile="{{ROOT}}\output\logs\stdout">
+      <environmentVariables>
+        <environmentVariable name="BASE_PATH" value="{{BASE_PATH}}" />
+        <environmentVariable name="SECRETS_FILE" value="{{ROOT}}\.streamlit\secrets.toml" />
+        <environmentVariable name="OUTPUT_DIR" value="{{ROOT}}\output" />
+        <environmentVariable name="TZ" value="Asia/Taipei" />
+      </environmentVariables>
+    </httpPlatform>
+  </system.webServer>
+</configuration>
