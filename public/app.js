@@ -158,7 +158,7 @@
           <p class="sub" style="margin-top:12px">看完影片後，按下方「開始作答」。</p>`;
       }
       h += st.questions.map((k) => questionHTML(k)).join("");
-      if (S.step > 0) h += `<div class="restart"><button type="button" class="link" data-act="restart"${S.sending ? " disabled" : ""}>重新作答</button></div>`;
+      h += `<div class="restart"><button type="button" class="link" data-act="restart"${S.sending ? " disabled" : ""}>回到首頁</button></div>`;
       body.innerHTML = h;
       const last = S.step === steps.length - 1;
       foot.className = "inner foot-in";
@@ -207,7 +207,10 @@
   }
   window.addEventListener("popstate", (e) => {
     const st = e.state;
-    if (S.view !== "survey") return; // done pages: back does nothing special
+    if (S.view !== "survey") { // home/done pages: just keep the address in step with the screen
+      if (!st || st.gen !== gen) history.replaceState({ view: S.view, step: 0, gen }, "", S.view === "home" ? location.pathname : `#${S.view}`);
+      return;
+    }
     if (st && st.view === "survey" && st.gen === gen) go("survey", st.step, false);
     else history.pushState({ view: "survey", step: S.step, gen }, "", `#step-${S.step + 1}`);
   });
@@ -243,13 +246,13 @@
     } else if (act === "home") {
       S = fresh(); persist(); go("home");
     } else if (act === "restart") {
-      if (S.sending || !(await ask("將清除已填寫內容，確定要重新作答嗎？", "重新作答"))) return;
-      // Same sid: the check-in row for this person is already written, so
-      // starting over must not count them twice.
-      S = { sid: S.sid, view: "survey", step: 0, a: {}, t: {} };
+      if (S.sending || !(await ask("將清除已填寫內容，確定要回到首頁嗎？", "回到首頁"))) return;
+      // Same sid: this person's check-in row is already written, so starting
+      // again or choosing 僅打卡 must not count them twice.
+      S = { sid: S.sid, view: "home", step: 0, a: {}, t: {} };
       gen = Date.now();
-      go("survey", 0, false);
-      history.replaceState({ view: "survey", step: 0, gen }, "", "#step-1");
+      go("home", 0, false);
+      history.replaceState({ view: "home", step: 0, gen }, "", location.pathname);
     } else if (act === "prev") {
       history.back();
     } else if (act === "play") {
