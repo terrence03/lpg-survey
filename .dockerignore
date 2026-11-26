@@ -1,0 +1,7 @@
+.git
+.streamlit
+output
+scripts
+**/__pycache__
+*.md
+docker-compose.yaml

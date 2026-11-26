@@ -1,0 +1,275 @@
+{
+  "video": "https://youtu.be/WV2S75hqnMc",
+  "questions": {
+    "q1": {
+      "no": "Q1",
+      "question": "依影片內容，簽訂瓦斯供氣契約可以保障哪些消費權益？",
+      "type": "single",
+      "answer": "4",
+      "options": {
+        "1": "A. 計價方式有2種可選擇：重量計價、氣量計價。",
+        "2": "B. 採重量計價之桶裝瓦斯，未用完可按比例退費",
+        "3": "C. 瓦斯行應於營業場所標示價格",
+        "4": "D. 以上皆是"
+      }
+    },
+    "q2": {
+      "no": "Q2",
+      "question": "瓦斯行若有額外收費，應在契約中事先約定並清楚說明，包含哪些項目？",
+      "type": "single",
+      "answer": "4",
+      "options": {
+        "1": "A. 約定瓦斯桶保證金，不再使用時退還",
+        "2": "B. 爬高樓層、距離較遠的額外收費",
+        "3": "C. 使用太久(1年以上)換桶的長期使用費",
+        "4": "D. 以上皆是"
+      }
+    },
+    "q3": {
+      "no": "Q3",
+      "question": "供氣定型化契約還保障哪些權益呢？",
+      "type": "single",
+      "answer": "4",
+      "options": {
+        "1": "A. 瓦斯行對留存的個人資料須負保密義務；契約終止應還給客戶資料或銷毀。",
+        "2": "B. 瓦斯行應由安全技術人員，提供2年1次供氣設備安全檢測服務。",
+        "3": "C. 瓦斯行歇業頂讓應通知消費者，經同意由頂讓瓦斯行承接原契約之權利義務。",
+        "4": "D. 以上皆是"
+      }
+    },
+    "gender": {
+      "no": "1",
+      "question": "請問您的性別？",
+      "type": "single",
+      "layout": "chips",
+      "other": "3",
+      "other_key": "gender_other",
+      "other_question": "請問您的性別？",
+      "options": {
+        "1": "男",
+        "2": "女",
+        "3": "其他"
+      }
+    },
+    "age": {
+      "no": "2",
+      "question": "請問您的年齡？",
+      "type": "single",
+      "layout": "chips",
+      "options": {
+        "1": "19歲以下",
+        "2": "20-29歲",
+        "3": "30-39歲",
+        "4": "40-49歲",
+        "5": "50-59歲",
+        "6": "60歲以上"
+      }
+    },
+    "lpg_usage": {
+      "no": "3",
+      "question": "家中是否使用桶裝瓦斯？",
+      "type": "single",
+      "layout": "chips",
+      "options": {
+        "1": "有",
+        "2": "無"
+      }
+    },
+    "contract": {
+      "no": "4",
+      "question": "您家中是否已與瓦斯行簽訂定型化契約？",
+      "type": "single",
+      "layout": "chips",
+      "parent": "lpg_usage",
+      "show": {
+        "q": "lpg_usage",
+        "eq": "1"
+      },
+      "options": {
+        "1": "是",
+        "2": "否"
+      }
+    },
+    "contract_no": {
+      "no": "4.1",
+      "question": "沒有簽的原因？（可複選）",
+      "type": "multi",
+      "parent": "contract",
+      "show": {
+        "q": "contract",
+        "eq": "2"
+      },
+      "other": "6",
+      "other_key": "contract_no_other",
+      "other_question": "沒有簽的原因？",
+      "options": {
+        "1": "不知道可以簽約",
+        "2": "瓦斯行不願意簽",
+        "3": "合作多年覺得沒必要",
+        "4": "契約內容太複雜",
+        "5": "擔心瓦斯行洩漏個資",
+        "6": "其他"
+      }
+    },
+    "contract_aware": {
+      "no": "5",
+      "question": "看完影片後，您是否瞭解定型化契約的主要內容？",
+      "type": "single",
+      "layout": "chips",
+      "options": {
+        "1": "完全瞭解",
+        "2": "大致瞭解",
+        "3": "不太瞭解",
+        "4": "完全不瞭解"
+      }
+    },
+    "contract_aware_no": {
+      "no": "5.1",
+      "question": "您不瞭解的部分主要是？(可複選)",
+      "type": "multi",
+      "parent": "contract_aware",
+      "show": {
+        "q": "contract_aware",
+        "in": [
+          "3",
+          "4"
+        ]
+      },
+      "other": "3",
+      "other_key": "contract_aware_no_other",
+      "other_question": "您不瞭解的部分主要是？",
+      "options": {
+        "1": "額外收費項目說明",
+        "2": "依比例退還未使用完的瓦斯氣價",
+        "3": "其他"
+      }
+    },
+    "contract_willing": {
+      "no": "6",
+      "question": "看完影片後，您是否有意願與瓦斯行簽約？",
+      "type": "single",
+      "layout": "chips",
+      "options": {
+        "1": "有意願",
+        "2": "無意願"
+      }
+    },
+    "contract_willing_no": {
+      "no": "6.1",
+      "question": "無意願的原因？(可複選)",
+      "type": "multi",
+      "parent": "contract_willing",
+      "show": {
+        "q": "contract_willing",
+        "eq": "2"
+      },
+      "other": "5",
+      "other_key": "contract_willing_no_other",
+      "other_question": "無意願的原因？",
+      "options": {
+        "1": "合作多年沒必要",
+        "2": "契約內容太複雜",
+        "3": "擔心瓦斯行不願簽約",
+        "4": "擔心瓦斯行洩漏個資",
+        "5": "其他"
+      }
+    },
+    "policy_info": {
+      "no": "7",
+      "question": "請問您通常從哪些管道接收政府宣導資訊？(可複選)",
+      "type": "multi",
+      "other": "9",
+      "other_key": "policy_info_other",
+      "other_question": "請問您通常從哪些管道接收政府宣導資訊？",
+      "options": {
+        "1": "地方或特色活動攤位",
+        "2": "社區集會、講座",
+        "3": "親朋好友告知",
+        "4": "電視",
+        "5": "報章雜誌",
+        "6": "廣播",
+        "7": "網路社群",
+        "8": "戶外廣告",
+        "9": "其他"
+      }
+    },
+    "policy_info_network": {
+      "no": "7.1",
+      "question": "您接收政令資訊的網路媒體管道是？(可複選)",
+      "type": "multi",
+      "parent": "policy_info",
+      "show": {
+        "q": "policy_info",
+        "has": "7"
+      },
+      "other": "5",
+      "other_key": "policy_info_network_other",
+      "other_question": "您接收政令資訊的網路媒體管道是？",
+      "options": {
+        "1": "Facebook",
+        "2": "Line",
+        "3": "Youtube",
+        "4": "政府官方網站",
+        "5": "其他"
+      }
+    },
+    "policy_info_advertising": {
+      "no": "7.2",
+      "question": "您接收政令資訊的戶外廣告管道是？(可複選)",
+      "type": "multi",
+      "parent": "policy_info",
+      "show": {
+        "q": "policy_info",
+        "has": "8"
+      },
+      "other": "6",
+      "other_key": "policy_info_advertising_other",
+      "other_question": "您接收政令資訊的戶外廣告管道是？",
+      "options": {
+        "1": "LED電視牆",
+        "2": "公車車體",
+        "3": "大型看板",
+        "4": "臺鐵車廂廣告",
+        "5": "燈箱廣告",
+        "6": "其他"
+      }
+    }
+  },
+  "steps": [
+    {
+      "title": "觀看宣導影片",
+      "video": true,
+      "questions": []
+    },
+    {
+      "title": "宣導內容小測驗",
+      "hint": "選完會立即顯示答案",
+      "questions": [
+        "q1",
+        "q2",
+        "q3"
+      ]
+    },
+    {
+      "title": "基本資料",
+      "questions": [
+        "gender",
+        "age"
+      ]
+    },
+    {
+      "title": "桶裝瓦斯與契約",
+      "questions": [
+        "lpg_usage",
+        "contract_aware",
+        "contract_willing"
+      ]
+    },
+    {
+      "title": "宣導資訊管道",
+      "questions": [
+        "policy_info"
+      ]
+    }
+  ]
+}
