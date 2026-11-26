@@ -46,50 +46,52 @@ uvicorn server.main:app --reload --port 8080
 
 ## 部署到 Windows Server（IIS 子路徑，例如 https://lpg.org.tw/lpg-survey/）
 
-架構是 IIS 負責網域與 HTTPS，把 `/lpg-survey/` 底下的請求反向代理到本機的 uvicorn 服務。uvicorn 只聽 `127.0.0.1`，不會直接對外開放。前端全部使用相對路徑，所以放在子路徑底下不用改程式。
+IIS 負責網域和 HTTPS。微軟官方外掛 **HttpPlatformHandler** 會自動啟動問卷程式（uvicorn），把 `/lpg-survey/` 的請求轉給它，程式當掉時也會自動重啟。不需要另外安裝 NSSM、URL Rewrite 或 ARR。
 
 ```
-瀏覽器 ─ https://lpg.org.tw/lpg-survey/ ─▶ IIS（URL Rewrite + ARR）─▶ http://127.0.0.1:8538/（uvicorn，Windows 服務）
+瀏覽器 ─ https://lpg.org.tw/lpg-survey/ ─▶ IIS ─(HttpPlatformHandler)─▶ uvicorn（127.0.0.1，IIS 專屬低權限帳戶）
 ```
 
 ### 1. 安裝需要的軟體（一次性）
 
-- [Python 3.13 for Windows](https://www.python.org/downloads/windows/)：安裝時勾選「py launcher」。
-- [NSSM](https://nssm.cc/download)：用來把 uvicorn 包成 Windows 服務，例如解壓到 `C:\tools\nssm\`。
-- IIS 的 [URL Rewrite](https://www.iis.net/downloads/microsoft/url-rewrite) 和 [Application Request Routing](https://www.iis.net/downloads/microsoft/application-request-routing)。
-- 安裝 ARR 後，到 IIS 管理員點選伺服器節點 → Application Request Routing Cache → 右側 Server Proxy Settings → 勾選 **Enable proxy** → 套用。
+- [Python 3.13 for Windows](https://www.python.org/downloads/windows/)：按「Customize installation」，勾選 py launcher，並勾選「Install Python 3.13 for all users」。
+- [HttpPlatformHandler v1.2](https://www.iis.net/downloads/microsoft/httpplatformhandler)：選 x64 版，下載後點兩下安裝。
 
-### 2. 放程式並安裝服務
+### 2. 放程式並執行安裝腳本
 
-1. 把這個 repo 放到伺服器上，例如 `D:\apps\lpg-survey`，可以用 `git clone` 或直接複製。
+1. 把這個 repo 放到伺服器上，例如 `D:\apps\lpg-survey`，可以用 `git clone` 或下載 ZIP 解壓縮。
 2. 把原本的 `.streamlit\secrets.toml` 複製到 `D:\apps\lpg-survey\.streamlit\secrets.toml`，格式不用改。
 3. 以系統管理員身分開 PowerShell，執行：
 
 ```powershell
 cd D:\apps\lpg-survey
 Set-ExecutionPolicy -Scope Process Bypass
-.\deploy\windows\install-service.ps1 -Nssm C:\tools\nssm\nssm.exe
+.\deploy\windows\setup.ps1 -Site "lpg.org.tw"
 ```
 
-最後一行顯示 `ok : True` 就代表服務已經在跑。
+`-Site` 填 IIS 管理員左側看到的網站名稱。腳本會自動完成以下步驟：
+- 把套件裝進 `.venv`。
+- 產生 `iis\web.config`。
+- 建立專屬的應用程式集區。
+- 設定資料夾權限。
+- 在網站下建立 `/lpg-survey`。
+
+完成後，用手機開 https://lpg.org.tw/lpg-survey/ 測試。少打結尾的 `/` 也會自動補上。
 
 腳本預設用以下方式和系統隔開：
 - 套件裝在專案內的 `.venv`。
-- 服務以專屬低權限帳戶 `NT SERVICE\lpg-survey` 執行，只能讀取程式資料夾、寫入 `output\`。
+- 程式以 IIS 專屬低權限帳戶 `IIS AppPool\lpg-survey` 執行，只能讀取專案資料夾、寫入 `output\`。
 - `secrets.toml` 只有系統管理員和該帳戶讀得到。
-- 服務只監聽 `127.0.0.1`。
+- 程式只監聽 `127.0.0.1`。
 
-安裝 Python 時請選「Install for all users」，否則這個服務帳戶讀不到 Python。服務會開機自動啟動，log 寫在 `output\service.log`。如果寫入 Sheets 失敗，備援的 CSV 也在 `output\`。
+### 記錄檔與資料
 
-### 3. 在 IIS 掛上 /lpg-survey
-
-1. 建一個空資料夾，例如 `D:\iis\lpg-survey`，把 `deploy\windows\web.config` 複製進去。
-2. IIS 管理員 → lpg.org.tw 的站台 → 右鍵「新增應用程式」：別名填 `lpg-survey`，實體路徑選 `D:\iis\lpg-survey`。
-3. 開啟 https://lpg.org.tw/lpg-survey/ 測試。少打結尾的 `/` 也會自動補上。
+- 程式記錄在 `output\logs\`。
+- 寫入 Sheets 失敗時，備援資料存在 `output\checkin.csv` 和 `output\survey.csv`。
 
 ### 更新程式
 
-拉新版程式（`git pull`）後，執行 `C:\tools\nssm\nssm.exe restart lpg-survey`。如果 `requirements.txt` 有變動，要先執行 `.venv\Scripts\python -m pip install -r requirements.txt`。
+拉新版程式（`git pull` 或覆蓋檔案）後，重跑一次 `.\deploy\windows\setup.ps1 -Site "lpg.org.tw"` 即可。腳本可以重複執行，不會重複建立。
 
 ## 部署到 Google Cloud Run（另一個選項）
 

@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 from collections import OrderedDict
 from pathlib import Path
@@ -67,3 +68,18 @@ def submit(body: Survey):
 
 
 app.mount("/", StaticFiles(directory=Path(__file__).resolve().parent.parent / "public", html=True), name="static")
+
+# When the web server forwards the full URL (e.g. IIS HttpPlatformHandler at
+# /lpg-survey), set BASE_PATH so the app is served under that prefix.
+BASE_PATH = os.environ.get("BASE_PATH", "").rstrip("/")
+if BASE_PATH:
+    from fastapi.responses import RedirectResponse
+
+    inner = app
+    app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+
+    @app.get(BASE_PATH, include_in_schema=False)
+    def _add_slash():
+        return RedirectResponse(BASE_PATH + "/", status_code=301)
+
+    app.mount(BASE_PATH, inner)
